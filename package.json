@@ -1,6 +1,6 @@
 {
   "name": "@plus4nodered/node-red-contrib-modbus-server",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "description": "Modbus Server nodes for Node-RED - TCP, TLS and Demo server implementations.",
   "dependencies": {
@@ -21,7 +21,7 @@
     "biancoroyal"
   ],
   "engines": {
-    "node": ">=18.5"
+    "node": ">=20"
   },
   "repository": {
     "type": "git",
