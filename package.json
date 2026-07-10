@@ -3,6 +3,9 @@
   "version": "1.2.0",
   "private": false,
   "description": "Modbus Server nodes for Node-RED - TCP, TLS and Demo server implementations.",
+  "publishConfig": {
+    "registry": "https://packages.iniationware.com/api/packages/p4nr-nodejs-beta/npm/"
+  },
   "dependencies": {
     "jsmodbus": "4.0.10",
     "@xstate/fsm": "2.1.0",
