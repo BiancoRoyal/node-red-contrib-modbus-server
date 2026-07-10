@@ -1,7 +1,7 @@
 {
   "name": "@plus4nodered/node-red-contrib-modbus-server",
   "version": "1.2.0",
-  "private": true,
+  "private": false,
   "description": "Modbus Server nodes for Node-RED - TCP, TLS and Demo server implementations.",
   "dependencies": {
     "jsmodbus": "4.0.10",
