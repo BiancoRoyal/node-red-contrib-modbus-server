@@ -1,0 +1,12 @@
+version: 2
+updates:
+  - package-ecosystem: 'npm'
+    directory: '/'
+    target-branch: "main"
+    schedule:
+      interval: "weekly"
+    allow:
+      - dependency-type: "production"
+    ignore:
+      - dependency-name: "jsmodbus"
+      - dependency-name: "*jsmodbus*"

@@ -1,0 +1,74 @@
+name: "Bug Report"
+description: Report a bug or unexpected behavior in the Modbus Server nodes.
+labels:
+  - bug
+body:
+  - type: "input"
+    id: "version"
+    attributes:
+      label: Which node-red-contrib-modbus-server version are you using?
+      description: |
+        Check the installed version in your Node-RED user directory (default: `$HOME/.node-red/node_modules/@plus4nodered/node-red-contrib-modbus-server/package.json`).
+    validations:
+      required: true
+  - type: textarea
+    id: descriptions
+    attributes:
+      label: What happened?
+      description: |
+        Please provide a clear and thorough description of what happened.
+    validations:
+      required: true
+  - type: dropdown
+    id: server-node
+    attributes:
+      label: Server node
+      description: |
+        Which Modbus Server node from this package is affected?
+      multiple: false
+      options:
+        - Modbus-Server (TCP)
+        - Modbus-Server-TLS
+        - Modbus-Server-Demo
+        - Not sure / multiple nodes
+    validations:
+      required: true
+  - type: dropdown
+    id: client
+    attributes:
+      label: Modbus client
+      description: |
+        What connects to the server (if applicable)?
+      multiple: false
+      options:
+        - node-red-contrib-modbus client nodes
+        - External Modbus TCP client (PLC, SCADA, script, etc.)
+        - None / server startup or configuration issue
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: How can this be reproduced?
+      description: |
+        Please provide a step-by-step description of how to reproduce this behavior.
+        Attach relevant flows as a `.json` file (top-right menu → Export).
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+      description: |
+        Describe the expected behavior and how the actual behavior differed.
+    validations:
+      required: false
+
+  - type: textarea
+    id: other
+    attributes:
+      label: Other Information
+      description: |
+        Please provide any other relevant information, such as Node-RED, Node.js, or TLS certificate details.
+    validations:
+      required: false
