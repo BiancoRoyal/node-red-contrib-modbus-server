@@ -261,6 +261,32 @@ describe('Server node Testing', function () {
       })
     })
 
+    it('should suppress output when disableMsgOutput is set', function (done) {
+      const flow = Array.from(testFlows.testServerConfig)
+
+      getPort().then((port) => {
+        flow[1].serverPort = port
+
+        helper.load(testServerNodes, flow, function () {
+          const modbusServer = helper.getNode('249922d5ac72b8cd')
+          const sendMessageSpy = sinon.spy(modbusServer, 'send')
+
+          modbusServer.emit('input', {
+            payload: {
+              register: 'holding',
+              address: 0,
+              value: 99,
+              disableMsgOutput: 1
+            }
+          })
+
+          sinon.assert.notCalled(sendMessageSpy)
+          expect(modbusServer.modbusServer.holding.readUInt16BE(0)).to.equal(99)
+          done()
+        })
+      })
+    })
+
     // it('should handle errors during server initialization and show in status', function (done) {
     //   const flow = Array.from(testFlows.testSimpleNodeShouldThrowErrorFlow)
     //

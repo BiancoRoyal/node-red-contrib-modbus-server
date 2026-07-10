@@ -611,3 +611,45 @@ describe('writeToModbusFlexBuffer', () => {
     assert.strictEqual(node.coils.readUInt8(2), 1)
   })
 })
+
+describe('Core Server additional coverage', function () {
+  it('should use internal debug logger when node has no internalDebugLog', function () {
+    assert.strictEqual(typeof coreServerUnderTest.getLogFunction({}), 'function')
+  })
+
+  it('should calculate coil addresses for flex server memory writes', function () {
+    const node = {
+      splitAddress: 2,
+      registers: Buffer.alloc(20),
+      coils: Buffer.alloc(20)
+    }
+    const msg = {
+      payload: {
+        register: 'coils',
+        address: 4,
+        value: 1
+      }
+    }
+
+    coreServerUnderTest.writeModbusFlexServerMemory(node, msg)
+    assert.strictEqual(node.coils.readUInt8(4), 1)
+  })
+
+  it('should handle writeToFlexServerMemory errors', function () {
+    const node = { error: sinon.spy(), splitAddress: 0, registers: Buffer.alloc(10), coils: Buffer.alloc(10) }
+    const msg = { payload: { register: 'holding', address: 0, value: 1 } }
+
+    sinon.stub(coreServerUnderTest, 'writeModbusFlexServerMemory').throws(new Error('flex write failed'))
+    coreServerUnderTest.writeToFlexServerMemory(node, msg)
+
+    sinon.assert.calledOnce(node.error)
+    assert.ok(msg.error)
+    coreServerUnderTest.writeModbusFlexServerMemory.restore()
+  })
+
+  it('should validate isValidMessage for empty payloads', function () {
+    assert.strictEqual(coreServerUnderTest.isValidMessage(undefined), false)
+    assert.strictEqual(coreServerUnderTest.isValidMessage({ payload: null }), true)
+    assert.strictEqual(coreServerUnderTest.isValidMessage({ payload: { value: 1 } }), true)
+  })
+})

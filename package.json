@@ -48,11 +48,12 @@
   },
   "homepage": "https://biancoroyal.github.io/node-red-contrib-modbus-server/",
   "scripts": {
-    "test": "npm run prereq && npm run test:unit && npm run test:core",
+    "test": "npm run prereq && npm run test:unit && npm run test:core && npm run test:e2e",
     "test:unit": "mocha test/units/*.js --recursive --exit",
     "test:core": "mocha test/core/*.js --recursive --exit",
     "test:e2e": "mocha test/e2e/*.js --recursive --exit",
-    "test:coverage": "nyc --reporter=html --reporter=text npm test",
+    "test:coverage": "nyc --check-coverage --lines 92 --statements 92 --functions 90 --branches 80 npm run test:run",
+    "test:run": "npm run test:unit && npm run test:core && npm run test:e2e",
     "prereq": "npm run build",
     "lint": "standard --fix",
     "build": "npm run lint && gulp",
@@ -98,5 +99,22 @@
       "modbus/",
       "examples/"
     ]
+  },
+  "nyc": {
+    "include": [
+      "src/modbus-server.js",
+      "src/modbus-basics.js",
+      "src/core/**/*.js"
+    ],
+    "exclude": [
+      "src/modbus-server-demo.js",
+      "src/modbus-server-tls.js",
+      "src/icons/**"
+    ],
+    "reporter": [
+      "text",
+      "html"
+    ],
+    "all": true
   }
 }
