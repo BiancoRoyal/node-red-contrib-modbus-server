@@ -1,0 +1,102 @@
+{
+  "name": "@plus4nodered/node-red-contrib-modbus-server",
+  "version": "1.1.0",
+  "private": true,
+  "description": "Modbus Server nodes for Node-RED - TCP, TLS and Demo server implementations.",
+  "dependencies": {
+    "jsmodbus": "4.0.10",
+    "@xstate/fsm": "2.1.0",
+    "source-map-support": "0.5.21",
+    "underscore": "1.13.7",
+    "winston": "3.17.0"
+  },
+  "keywords": [
+    "node-red",
+    "plusfornodered",
+    "modbus",
+    "modbus-server",
+    "modbus-tcp",
+    "modbus-tls",
+    "automation",
+    "biancoroyal"
+  ],
+  "engines": {
+    "node": ">=18.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/biancoroyal/node-red-contrib-modbus-server.git"
+  },
+  "node-red": {
+    "version": ">=4",
+    "nodes": {
+      "Modbus-Server": "modbus/modbus-server.js",
+      "Modbus-Server-Demo": "modbus/modbus-server-demo.js",
+      "Modbus-Server-TLS": "modbus/modbus-server-tls.js"
+    }
+  },
+  "author": "Klaus Landsdorf <klaus.landsdorf@bianco-royal.de>",
+  "license": "BSD-3-Clause",
+  "main": "node",
+  "files": [
+    "docs",
+    "examples",
+    "modbus"
+  ],
+  "bugs": {
+    "url": "https://github.com/biancoroyal/node-red-contrib-modbus-server/issues"
+  },
+  "homepage": "https://biancoroyal.github.io/node-red-contrib-modbus-server/",
+  "scripts": {
+    "test": "npm run prereq && npm run test:unit && npm run test:core",
+    "test:unit": "mocha test/units/*.js --recursive --exit",
+    "test:core": "mocha test/core/*.js --recursive --exit",
+    "test:e2e": "mocha test/e2e/*.js --recursive --exit",
+    "test:coverage": "nyc --reporter=html --reporter=text npm test",
+    "prereq": "npm run build",
+    "lint": "standard --fix",
+    "build": "npm run lint && gulp",
+    "clean": "gulp clean",
+    "release": "standard-version",
+    "rewrite-changelog": "node ./scripts/rewrite-changelog.js"
+  },
+  "devDependencies": {
+    "@babel/cli": "~7.26.0",
+    "@babel/core": "~7.26.0",
+    "@babel/preset-env": "~7.26.0",
+    "address": "^2.0.3",
+    "babel-preset-minify": "~0.5.2",
+    "chai": "~5.1.2",
+    "gulp": "~5.0.0",
+    "gulp-babel": "~8.0.0",
+    "gulp-clean": "~0.4.0",
+    "gulp-htmlmin": "~5.0.1",
+    "gulp-replace": "~1.1.4",
+    "gulp-sourcemaps": "~3.0.0",
+    "mocha": "~10.8.2",
+    "node-red": "~4.1.0",
+    "node-red-node-test-helper": "~0.3.5",
+    "nyc": "~17.1.0",
+    "sinon": "~19.0.2",
+    "standard": "~17.1.2",
+    "standard-version": "~9.5.0"
+  },
+  "standard": {
+    "globals": [
+      "describe",
+      "it",
+      "before",
+      "after",
+      "beforeEach",
+      "afterEach"
+    ],
+    "ignore": [
+      "node_modules/",
+      "code/",
+      "coverage/",
+      "docs",
+      "modbus/",
+      "examples/"
+    ]
+  }
+}
