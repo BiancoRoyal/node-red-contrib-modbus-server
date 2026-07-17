@@ -8,7 +8,7 @@
     "@xstate/fsm": "2.1.0",
     "source-map-support": "0.5.21",
     "underscore": "1.13.7",
-    "winston": "3.17.0"
+    "winston": "3.19.0"
   },
   "keywords": [
     "node-red",
