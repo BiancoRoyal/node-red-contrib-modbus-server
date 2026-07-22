@@ -2,5 +2,5 @@
 @plus4nodered:registry=https://packages.iniationware.com/api/packages/p4nr-nodejs-beta/npm/
 @openp4nr:registry=https://packages.iniationware.com/api/packages/plus4nodered/npm/
 //packages.iniationware.com/api/packages/p4nr-nodejs-beta/npm/:_authToken=${NPM_TOKEN}
-//packages.iniationware.com/api/packages/plus4nodered/npm/:_authToken=
+//packages.iniationware.com/api/packages/plus4nodered/npm/:_authToken=${NPM_TOKEN}
 registry=https://registry.npmjs.org/

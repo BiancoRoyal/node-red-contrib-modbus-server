@@ -1,6 +1,6 @@
 {
   "name": "@plus4nodered/node-red-contrib-modbus-server",
-  "version": "1.2.0",
+  "version": "2.0.0-beta.1",
   "private": false,
   "description": "Modbus Server nodes for Node-RED - TCP, TLS and Demo server implementations.",
   "publishConfig": {
@@ -58,14 +58,19 @@
     "test:unit": "mocha test/units/*.js --recursive --exit",
     "test:core": "mocha test/core/*.js --recursive --exit",
     "test:e2e": "mocha test/e2e/*.js --recursive --exit",
+    "test:examples": "mocha test/e2e/examples-learning-path.test.js --exit",
     "test:coverage": "nyc --check-coverage --lines 92 --statements 92 --functions 90 --branches 80 npm run test:run",
     "test:run": "npm run test:unit && npm run test:core && npm run test:e2e",
+    "ci:quality-gate": "npm run lint && npm run build",
     "prereq": "npm run build",
     "lint": "standard --fix",
     "build": "npm run lint && gulp",
     "clean": "gulp clean",
     "release": "standard-version",
-    "rewrite-changelog": "node ./scripts/rewrite-changelog.js"
+    "rewrite-changelog": "node ./scripts/rewrite-changelog.js",
+    "dev:link": "npm i && npm run build && npm link",
+    "dev:unlink": "npm unlink @plus4nodered/node-red-contrib-modbus-server -g",
+    "dev:link-local": "npm run build && npm link"
   },
   "devDependencies": {
     "@babel/cli": "~7.26.0",
@@ -82,7 +87,8 @@
     "gulp-sourcemaps": "~3.0.0",
     "mocha": "~10.8.2",
     "node-red": "~4.1.0",
-    "node-red-node-test-helper": "~0.3.5",
+    "@openp4nr/node-red-node-test-helper": "^0.4.0-beta.1",
+    "node-red-node-test-helper": "npm:@openp4nr/node-red-node-test-helper@^0.4.0-beta.1",
     "nyc": "~17.1.0",
     "sinon": "~19.0.2",
     "standard": "~17.1.2",
