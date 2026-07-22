@@ -1,0 +1,200 @@
+[
+  {
+    "id": "b3463f9534631c46",
+    "type": "tab",
+    "label": "06 Test With Modbus Client",
+    "disabled": false,
+    "info": "Learning path step 6 (optional dependency).\n\nRequires @plus4nodered/node-red-contrib-modbus >= 6.\nPoll timing is on the Inject node (repeat), not on the read node.\n\nDocs: docs/05-testing-with-client.md"
+  },
+  {
+    "id": "34163b09ee3e33d2",
+    "type": "comment",
+    "z": "b3463f9534631c46",
+    "name": "Step 6 — Client against server",
+    "info": "Install first:\nnpm install @plus4nodered/node-red-contrib-modbus@^6\n\nThen deploy this flow.\nServer port: 10506\nInject repeat drives reads.",
+    "x": 230,
+    "y": 40,
+    "wires": []
+  },
+  {
+    "id": "1b04faad8d3f6f2d",
+    "type": "modbus-server",
+    "z": "b3463f9534631c46",
+    "name": "Server under test",
+    "logEnabled": false,
+    "hostname": "127.0.0.1",
+    "serverPort": "10506",
+    "responseDelay": 50,
+    "delayUnit": "ms",
+    "coilsBufferSize": 256,
+    "holdingBufferSize": 256,
+    "inputBufferSize": 256,
+    "discreteBufferSize": 256,
+    "showErrors": true,
+    "showStatusActivities": true,
+    "x": 520,
+    "y": 120,
+    "wires": [
+      [],
+      [],
+      [],
+      [],
+      []
+    ]
+  },
+  {
+    "id": "f94b216358e1d779",
+    "type": "inject",
+    "z": "b3463f9534631c46",
+    "name": "Seed holding 4711",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": true,
+    "onceDelay": "1",
+    "topic": "",
+    "payload": "4711",
+    "payloadType": "num",
+    "x": 160,
+    "y": 120,
+    "wires": [
+      [
+        "8e34aa9f02fd7b6e"
+      ]
+    ]
+  },
+  {
+    "id": "8e34aa9f02fd7b6e",
+    "type": "function",
+    "z": "b3463f9534631c46",
+    "name": "seed holding",
+    "func": "msg.payload = {\n  value: msg.payload,\n  register: 'holding',\n  address: 0,\n  disableMsgOutput: 1\n}\nreturn msg",
+    "outputs": 1,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 340,
+    "y": 120,
+    "wires": [
+      [
+        "1b04faad8d3f6f2d"
+      ]
+    ]
+  },
+  {
+    "id": "259763f24eca221b",
+    "type": "modbus-client",
+    "name": "TCP to local server",
+    "clienttype": "tcp",
+    "bufferCommands": true,
+    "stateLogEnabled": false,
+    "queueLogEnabled": false,
+    "failureLogEnabled": false,
+    "tcpHost": "127.0.0.1",
+    "tcpPort": "10506",
+    "tcpType": "DEFAULT",
+    "serialPort": "",
+    "serialType": "RTU",
+    "serialBaudrate": "9600",
+    "serialDatabits": "8",
+    "serialStopbits": "1",
+    "serialParity": "none",
+    "serialConnectionDelay": "100",
+    "serialAsciiResponseStartDelimiter": "0x3A",
+    "unit_id": "1",
+    "commandDelay": "1",
+    "clientTimeout": "2000",
+    "reconnectOnTimeout": true,
+    "reconnectTimeout": "3000",
+    "parallelUnitIdsAllowed": true
+  },
+  {
+    "id": "a2bbf9c9b4d6fb08",
+    "type": "inject",
+    "z": "b3463f9534631c46",
+    "name": "Read holding (every 5s)",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "5",
+    "crontab": "",
+    "once": false,
+    "onceDelay": "2",
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 180,
+    "y": 220,
+    "wires": [
+      [
+        "24b26b02ed0e550d"
+      ]
+    ]
+  },
+  {
+    "id": "24b26b02ed0e550d",
+    "type": "modbus-read",
+    "z": "b3463f9534631c46",
+    "name": "FC3 holding @0",
+    "topic": "",
+    "showStatusActivities": true,
+    "logIOActivities": false,
+    "showErrors": true,
+    "showWarnings": true,
+    "unitid": "",
+    "dataType": "HoldingRegister",
+    "adr": "0",
+    "quantity": "1",
+    "rate": "1",
+    "rateUnit": "s",
+    "delayOnStart": false,
+    "startDelayTime": "",
+    "server": "259763f24eca221b",
+    "useIOFile": false,
+    "ioFile": "",
+    "useIOForPayload": false,
+    "emptyMsgOnFail": false,
+    "x": 420,
+    "y": 220,
+    "wires": [
+      [
+        "462e611b45cf7be4"
+      ],
+      []
+    ]
+  },
+  {
+    "id": "462e611b45cf7be4",
+    "type": "debug",
+    "z": "b3463f9534631c46",
+    "name": "client read result",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": true,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "payload",
+    "statusType": "auto",
+    "x": 650,
+    "y": 220,
+    "wires": []
+  },
+  {
+    "id": "9aa94b4b02339f4d",
+    "type": "comment",
+    "z": "b3463f9534631c46",
+    "name": "Poll rate = Inject repeat",
+    "info": "Do not rely on the read-node interval UI for learning.\nDisable/ignore built-in rate if your client package still exposes it;\nthe Inject node is the source of truth for timing in this learning path.",
+    "x": 200,
+    "y": 280,
+    "wires": []
+  }
+]

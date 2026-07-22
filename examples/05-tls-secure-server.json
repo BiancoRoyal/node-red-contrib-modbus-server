@@ -1,0 +1,102 @@
+[
+  {
+    "id": "53bc391d5e443931",
+    "type": "tab",
+    "label": "05 TLS Secure Server",
+    "disabled": false,
+    "info": "Learning path step 5.\n\nModbus-Server-TLS in demo mode for local experiments.\nFor production, set privateKey / certificate / ca.\n\nDocs: docs/04-tls-server.md"
+  },
+  {
+    "id": "12c5713b927f2612",
+    "type": "comment",
+    "z": "53bc391d5e443931",
+    "name": "Step 5 — TLS server",
+    "info": "Demo mode uses generated material for local TLS labs.\nPort: 8502\n\nTo use real certs, edit the TLS node and fill key/cert/CA paths.",
+    "x": 180,
+    "y": 40,
+    "wires": []
+  },
+  {
+    "id": "fccd7ad271f8cf86",
+    "type": "modbus-server-tls",
+    "z": "53bc391d5e443931",
+    "name": "TLS Demo Server",
+    "logEnabled": false,
+    "hostname": "127.0.0.1",
+    "serverPort": "8502",
+    "responseDelay": 50,
+    "delayUnit": "ms",
+    "showStatusActivities": true,
+    "showErrors": true,
+    "coilsBufferSize": 128,
+    "holdingBufferSize": 128,
+    "inputBufferSize": 128,
+    "discreteBufferSize": 128,
+    "privateKey": "",
+    "certificate": "",
+    "ca": "",
+    "rejectUnauthorized": false,
+    "requestCert": false,
+    "secureProtocol": "TLSv1_2_method",
+    "demoMode": true,
+    "demoDataPattern": "sequential",
+    "demoUpdateInterval": 2000,
+    "x": 480,
+    "y": 140,
+    "wires": [
+      [
+        "159403ce696d0273"
+      ]
+    ]
+  },
+  {
+    "id": "159403ce696d0273",
+    "type": "debug",
+    "z": "53bc391d5e443931",
+    "name": "tls status",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "x": 690,
+    "y": 140,
+    "wires": []
+  },
+  {
+    "id": "f4bf648af15dcd86",
+    "type": "inject",
+    "z": "53bc391d5e443931",
+    "name": "Request status",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 150,
+    "y": 140,
+    "wires": [
+      [
+        "fccd7ad271f8cf86"
+      ]
+    ]
+  },
+  {
+    "id": "9127b58e273165bd",
+    "type": "comment",
+    "z": "53bc391d5e443931",
+    "name": "Optional: test with client package v6+",
+    "info": "npm install @plus4nodered/node-red-contrib-modbus@^6\nConfigure a TLS-enabled Modbus client against 127.0.0.1:8502",
+    "x": 250,
+    "y": 220,
+    "wires": []
+  }
+]

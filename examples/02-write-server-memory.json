@@ -1,0 +1,244 @@
+[
+  {
+    "id": "23e24235401f4bb1",
+    "type": "tab",
+    "label": "02 Write Server Memory",
+    "disabled": false,
+    "info": "Learning path step 2.\n\nWrite holding, coils, input and discrete registers via Function → Modbus-Server.\n\nDocs: docs/02-server-memory.md"
+  },
+  {
+    "id": "41618ea090d4e488",
+    "type": "comment",
+    "z": "23e24235401f4bb1",
+    "name": "Step 2 — Write server memory",
+    "info": "Each Inject builds a memory-write payload.\nValid registers: holding, coils, input, discrete.\n\nPort: 10503",
+    "x": 210,
+    "y": 40,
+    "wires": []
+  },
+  {
+    "id": "fa32e2708f9a032d",
+    "type": "modbus-server",
+    "z": "23e24235401f4bb1",
+    "name": "Memory Server",
+    "logEnabled": false,
+    "hostname": "127.0.0.1",
+    "serverPort": "10503",
+    "responseDelay": 50,
+    "delayUnit": "ms",
+    "coilsBufferSize": 256,
+    "holdingBufferSize": 256,
+    "inputBufferSize": 256,
+    "discreteBufferSize": 256,
+    "showErrors": true,
+    "showStatusActivities": true,
+    "x": 560,
+    "y": 200,
+    "wires": [
+      [
+        "ddcb1a560a05d549"
+      ],
+      [
+        "ddcb1a560a05d549"
+      ],
+      [
+        "ddcb1a560a05d549"
+      ],
+      [
+        "ddcb1a560a05d549"
+      ],
+      []
+    ]
+  },
+  {
+    "id": "ddcb1a560a05d549",
+    "type": "debug",
+    "z": "23e24235401f4bb1",
+    "name": "server buffers",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "type",
+    "targetType": "msg",
+    "x": 760,
+    "y": 200,
+    "wires": []
+  },
+  {
+    "id": "2b572e1281274341",
+    "type": "inject",
+    "z": "23e24235401f4bb1",
+    "name": "Write holding 42 @0",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "42",
+    "payloadType": "num",
+    "x": 160,
+    "y": 100,
+    "wires": [
+      [
+        "779c066c0e34d790"
+      ]
+    ]
+  },
+  {
+    "id": "779c066c0e34d790",
+    "type": "function",
+    "z": "23e24235401f4bb1",
+    "name": "holding payload",
+    "func": "msg.payload = {\n  value: msg.payload,\n  register: 'holding',\n  address: 0,\n  disableMsgOutput: 0\n}\nreturn msg",
+    "outputs": 1,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 360,
+    "y": 100,
+    "wires": [
+      [
+        "fa32e2708f9a032d"
+      ]
+    ]
+  },
+  {
+    "id": "fdb79dc8d2166cb7",
+    "type": "inject",
+    "z": "23e24235401f4bb1",
+    "name": "Write coil true @0",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "true",
+    "payloadType": "bool",
+    "x": 160,
+    "y": 160,
+    "wires": [
+      [
+        "02b3c14610749f02"
+      ]
+    ]
+  },
+  {
+    "id": "02b3c14610749f02",
+    "type": "function",
+    "z": "23e24235401f4bb1",
+    "name": "coils payload",
+    "func": "msg.payload = {\n  value: msg.payload ? 1 : 0,\n  register: 'coils',\n  address: 0,\n  disableMsgOutput: 0\n}\nreturn msg",
+    "outputs": 1,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 360,
+    "y": 160,
+    "wires": [
+      [
+        "fa32e2708f9a032d"
+      ]
+    ]
+  },
+  {
+    "id": "9685f83fcbfd9cb6",
+    "type": "inject",
+    "z": "23e24235401f4bb1",
+    "name": "Write input 100 @0",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "100",
+    "payloadType": "num",
+    "x": 160,
+    "y": 220,
+    "wires": [
+      [
+        "5a658358dbc82ca0"
+      ]
+    ]
+  },
+  {
+    "id": "5a658358dbc82ca0",
+    "type": "function",
+    "z": "23e24235401f4bb1",
+    "name": "input payload",
+    "func": "msg.payload = {\n  value: msg.payload,\n  register: 'input',\n  address: 0,\n  disableMsgOutput: 0\n}\nreturn msg",
+    "outputs": 1,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 360,
+    "y": 220,
+    "wires": [
+      [
+        "fa32e2708f9a032d"
+      ]
+    ]
+  },
+  {
+    "id": "516ee39d27eafc78",
+    "type": "inject",
+    "z": "23e24235401f4bb1",
+    "name": "Write discrete 1 @0",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "1",
+    "payloadType": "num",
+    "x": 160,
+    "y": 280,
+    "wires": [
+      [
+        "7dc5477382cb323a"
+      ]
+    ]
+  },
+  {
+    "id": "7dc5477382cb323a",
+    "type": "function",
+    "z": "23e24235401f4bb1",
+    "name": "discrete payload",
+    "func": "msg.payload = {\n  value: msg.payload,\n  register: 'discrete',\n  address: 0,\n  disableMsgOutput: 0\n}\nreturn msg",
+    "outputs": 1,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 360,
+    "y": 280,
+    "wires": [
+      [
+        "fa32e2708f9a032d"
+      ]
+    ]
+  }
+]

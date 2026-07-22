@@ -1,0 +1,155 @@
+[
+  {
+    "id": "0d3782721ecd49ad",
+    "type": "tab",
+    "label": "01 Hello Modbus Server",
+    "disabled": false,
+    "info": "Learning path step 1.\n\nStarts a Modbus TCP server on 127.0.0.1:10502.\nClick Dump buffers to see the five outputs.\n\nDocs: docs/01-getting-started.md"
+  },
+  {
+    "id": "b9d9c764c0cd4cec",
+    "type": "comment",
+    "z": "0d3782721ecd49ad",
+    "name": "Step 1 — Hello Modbus Server",
+    "info": "1. Deploy this flow\n2. Click Dump buffers\n3. Open the Debug sidebar\n\nOutputs:\n1 holding, 2 coils, 3 input, 4 discrete, 5 request",
+    "x": 200,
+    "y": 40,
+    "wires": []
+  },
+  {
+    "id": "2d21a71ee521f77e",
+    "type": "inject",
+    "z": "0d3782721ecd49ad",
+    "name": "Dump buffers",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 140,
+    "y": 120,
+    "wires": [
+      [
+        "0df51b09c4506c82"
+      ]
+    ]
+  },
+  {
+    "id": "0df51b09c4506c82",
+    "type": "modbus-server",
+    "z": "0d3782721ecd49ad",
+    "name": "Hello Server",
+    "logEnabled": false,
+    "hostname": "127.0.0.1",
+    "serverPort": "10502",
+    "responseDelay": 50,
+    "delayUnit": "ms",
+    "coilsBufferSize": 256,
+    "holdingBufferSize": 256,
+    "inputBufferSize": 256,
+    "discreteBufferSize": 256,
+    "showErrors": true,
+    "showStatusActivities": true,
+    "x": 360,
+    "y": 120,
+    "wires": [
+      [
+        "1bd335bc3395a57d"
+      ],
+      [
+        "a23b2b28aab35dd1"
+      ],
+      [
+        "74c7052631bc3f9c"
+      ],
+      [
+        "3ed4be7542ee6087"
+      ],
+      [
+        "9699b932d6b7d815"
+      ]
+    ]
+  },
+  {
+    "id": "1bd335bc3395a57d",
+    "type": "debug",
+    "z": "0d3782721ecd49ad",
+    "name": "1 holding",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "true",
+    "targetType": "full",
+    "x": 580,
+    "y": 40,
+    "wires": []
+  },
+  {
+    "id": "a23b2b28aab35dd1",
+    "type": "debug",
+    "z": "0d3782721ecd49ad",
+    "name": "2 coils",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "true",
+    "targetType": "full",
+    "x": 570,
+    "y": 80,
+    "wires": []
+  },
+  {
+    "id": "74c7052631bc3f9c",
+    "type": "debug",
+    "z": "0d3782721ecd49ad",
+    "name": "3 input",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "true",
+    "targetType": "full",
+    "x": 570,
+    "y": 120,
+    "wires": []
+  },
+  {
+    "id": "3ed4be7542ee6087",
+    "type": "debug",
+    "z": "0d3782721ecd49ad",
+    "name": "4 discrete",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "true",
+    "targetType": "full",
+    "x": 580,
+    "y": 160,
+    "wires": []
+  },
+  {
+    "id": "9699b932d6b7d815",
+    "type": "debug",
+    "z": "0d3782721ecd49ad",
+    "name": "5 request",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "true",
+    "targetType": "full",
+    "x": 580,
+    "y": 200,
+    "wires": []
+  }
+]

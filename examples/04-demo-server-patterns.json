@@ -1,0 +1,188 @@
+[
+  {
+    "id": "80f544110ce81afb",
+    "type": "tab",
+    "label": "04 Demo Server Patterns",
+    "disabled": false,
+    "info": "Learning path step 4.\n\nControl Modbus-Server-Demo via Inject payloads.\nServer auto-starts; use Stop/Start demo to control generation.\n\nDocs: docs/03-demo-server.md"
+  },
+  {
+    "id": "144a4cb682dac6b4",
+    "type": "comment",
+    "z": "80f544110ce81afb",
+    "name": "Step 4 — Demo patterns",
+    "info": "1. Deploy\n2. Click Start demo\n3. Try Pattern sine / Reset / Stop demo\n\nKeep intervals moderate. Port: 10505",
+    "x": 200,
+    "y": 40,
+    "wires": []
+  },
+  {
+    "id": "99579b79759468c9",
+    "type": "modbus-server-demo",
+    "z": "80f544110ce81afb",
+    "name": "Demo Server",
+    "logEnabled": false,
+    "hostname": "127.0.0.1",
+    "serverPort": "10505",
+    "responseDelay": 50,
+    "delayUnit": "ms",
+    "showStatusActivities": true,
+    "showErrors": true,
+    "coilsBufferSize": 128,
+    "holdingBufferSize": 128,
+    "inputBufferSize": 128,
+    "discreteBufferSize": 128,
+    "demoDataPattern": "sequential",
+    "demoUpdateInterval": 1000,
+    "demoAutoStart": true,
+    "demoRandomSeed": null,
+    "demoValueMin": 0,
+    "demoValueMax": 1000,
+    "demoRealisticMode": false,
+    "demoDeviceSimulation": "generic",
+    "demoErrorRate": 0,
+    "x": 520,
+    "y": 180,
+    "wires": [
+      [
+        "d3f4557961926fd6"
+      ]
+    ]
+  },
+  {
+    "id": "d3f4557961926fd6",
+    "type": "debug",
+    "z": "80f544110ce81afb",
+    "name": "demo status",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": true,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "payload.pattern",
+    "statusType": "auto",
+    "x": 720,
+    "y": 180,
+    "wires": []
+  },
+  {
+    "id": "9852612cfd4fca9c",
+    "type": "inject",
+    "z": "80f544110ce81afb",
+    "name": "Start demo",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "startdemo",
+    "payloadType": "str",
+    "x": 140,
+    "y": 100,
+    "wires": [
+      [
+        "99579b79759468c9"
+      ]
+    ]
+  },
+  {
+    "id": "ee24196d20eab93a",
+    "type": "inject",
+    "z": "80f544110ce81afb",
+    "name": "Stop demo",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "stopdemo",
+    "payloadType": "str",
+    "x": 140,
+    "y": 140,
+    "wires": [
+      [
+        "99579b79759468c9"
+      ]
+    ]
+  },
+  {
+    "id": "a71c97f211b6bca3",
+    "type": "inject",
+    "z": "80f544110ce81afb",
+    "name": "Reset",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "reset",
+    "payloadType": "str",
+    "x": 130,
+    "y": 180,
+    "wires": [
+      [
+        "99579b79759468c9"
+      ]
+    ]
+  },
+  {
+    "id": "e1af0ab9bcf5e2a4",
+    "type": "inject",
+    "z": "80f544110ce81afb",
+    "name": "Pattern sine",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 140,
+    "y": 240,
+    "wires": [
+      [
+        "9fb0f5f614395449"
+      ]
+    ]
+  },
+  {
+    "id": "9fb0f5f614395449",
+    "type": "function",
+    "z": "80f544110ce81afb",
+    "name": "set sine pattern",
+    "func": "msg.payload = {\n  pattern: 'sine',\n  interval: 1000,\n  min: 0,\n  max: 1000\n}\nreturn msg",
+    "outputs": 1,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 330,
+    "y": 240,
+    "wires": [
+      [
+        "99579b79759468c9"
+      ]
+    ]
+  }
+]

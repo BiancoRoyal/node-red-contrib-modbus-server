@@ -1,55 +1,65 @@
 # node-red-contrib-modbus-server
 
-Modbus Server nodes for Node-RED - separated from the main node-red-contrib-modbus package for improved security and modularity.
+Modbus Server nodes for Node-RED — TCP, TLS and Demo server implementations.
+
+Separated from the main client package for security and modularity.
 
 ## Installation
 
 ```bash
+cd ~/.node-red
 npm install @plus4nodered/node-red-contrib-modbus-server
 ```
+
+Restart Node-RED afterwards.
 
 ## Features
 
-This package provides Modbus server functionality for Node-RED:
+| Node | Description |
+|------|-------------|
+| **Modbus-Server** | Standard Modbus TCP server |
+| **Modbus-Server-TLS** | TLS-secured Modbus TCP server |
+| **Modbus-Server-Demo** | Demo server with generated register data |
 
-- **Modbus-Server**: Standard Modbus TCP server
-- **Modbus-Server-TLS**: TLS-secured Modbus TCP server
-- **Modbus-Server-Demo**: Demo server for testing
+## Learning path
 
-## Why a Separate Package?
+Start here if you are new to Modbus servers in Node-RED: [`docs/README.md`](./docs/README.md).
 
-The server functionality has been extracted from the main `node-red-contrib-modbus` package to:
+| Step | Example | Topic |
+|------|---------|-------|
+| 01 | Hello Modbus Server | Start server, five outputs |
+| 02 | Write Server Memory | Holding / coils / input / discrete |
+| 03 | Observe Server Buffers | Inject-timed buffer dumps |
+| 04 | Demo Server Patterns | Controlled demo generation |
+| 05 | TLS Secure Server | TLS demo mode |
+| 06 | Test With Modbus Client | Optional client package **v6+** |
 
-1. **Improve Security**: Remove the `jsmodbus` dependency from the main package
-2. **Reduce Size**: Users who only need client functionality get a smaller package
-3. **Modularity**: Install only what you need
-4. **Independent Updates**: Server and client can be updated independently
+Import the numbered JSON files from [`examples/`](./examples/) (e.g. `01-hello-modbus-server.json`) via Node-RED **Menu → Import**.
 
-## Migration from node-red-contrib-modbus
+## Optional client package
 
-If you're upgrading from node-red-contrib-modbus v5.x or earlier:
+This package is **server-only**. To test against a Modbus TCP client in Node-RED:
 
 ```bash
-# Install both packages if you need server functionality
-npm install @plus4nodered/node-red-contrib-modbus
+npm install @plus4nodered/node-red-contrib-modbus@^6
+```
+
+See [docs/05-testing-with-client.md](./docs/05-testing-with-client.md) and example `06`.
+
+## Why a separate package?
+
+1. Keep `jsmodbus` out of the main client package
+2. Smaller installs when you only need clients or only need servers
+3. Independent release cycles
+
+## Migration from node-red-contrib-modbus ≤ v5
+
+```bash
+npm install @plus4nodered/node-red-contrib-modbus@^6
 npm install @plus4nodered/node-red-contrib-modbus-server
 ```
 
-Your existing flows will continue to work after installing both packages.
-
-## Usage
-
-The nodes work exactly as they did in the combined package. Simply:
-
-1. Install this package
-2. Restart Node-RED
-3. Find the Modbus server nodes in the Node-RED palette
-4. Use them in your flows as before
-
-## Documentation
-
-For detailed documentation, see the main package documentation:
-- [node-red-contrib-modbus](https://github.com/biancoroyal/node-red-contrib-modbus)
+Existing server nodes continue to work after both packages are installed.
 
 ## License
 
@@ -57,10 +67,9 @@ BSD-3-Clause
 
 ## Author
 
-Klaus Landsdorf <klaus.landsdorf@bianco-royal.de>
+Klaus Landsdorf &lt;klaus.landsdorf@bianco-royal.de&gt;
 
 ## Support
 
-For support, please visit:
-- [GitHub Issues](https://github.com/biancoroyal/node-red-contrib-modbus-server/issues)
-- [Plus for Node-RED](http://plus4nodered.com/)
+- Issues: repository issue tracker
+- [Plus for Node-RED](https://plus4nodered.com/)

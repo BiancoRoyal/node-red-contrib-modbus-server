@@ -1,0 +1,190 @@
+[
+  {
+    "id": "4b45de31d290a7ad",
+    "type": "tab",
+    "label": "03 Observe Server Buffers",
+    "disabled": false,
+    "info": "Learning path step 3.\n\nSeed memory, then dump buffers on a gentle Inject interval.\nTiming is controlled by Inject repeat — not by a read-node poll rate.\n\nDocs: docs/02-server-memory.md"
+  },
+  {
+    "id": "7ce8efc8107ebf6d",
+    "type": "comment",
+    "z": "4b45de31d290a7ad",
+    "name": "Step 3 — Observe buffers",
+    "info": "1. Click Seed values once\n2. Enable Observe dump (Inject repeat 5s) if desired\n3. Watch typed buffer outputs\n\nPort: 10504",
+    "x": 200,
+    "y": 40,
+    "wires": []
+  },
+  {
+    "id": "9fc779f4070229f4",
+    "type": "modbus-server",
+    "z": "4b45de31d290a7ad",
+    "name": "Observe Server",
+    "logEnabled": false,
+    "hostname": "127.0.0.1",
+    "serverPort": "10504",
+    "responseDelay": 50,
+    "delayUnit": "ms",
+    "coilsBufferSize": 256,
+    "holdingBufferSize": 256,
+    "inputBufferSize": 256,
+    "discreteBufferSize": 256,
+    "showErrors": true,
+    "showStatusActivities": true,
+    "x": 520,
+    "y": 180,
+    "wires": [
+      [
+        "5cf05c80c73e69f5"
+      ],
+      [
+        "79d1c18e123aae73"
+      ],
+      [
+        "2d6d818c22b567a6"
+      ],
+      [
+        "78cbe08674c4c1fd"
+      ],
+      []
+    ]
+  },
+  {
+    "id": "1728d1f86f873478",
+    "type": "inject",
+    "z": "4b45de31d290a7ad",
+    "name": "Seed values",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": true,
+    "onceDelay": "1",
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 140,
+    "y": 120,
+    "wires": [
+      [
+        "eb269b9001ca463a"
+      ]
+    ]
+  },
+  {
+    "id": "eb269b9001ca463a",
+    "type": "function",
+    "z": "4b45de31d290a7ad",
+    "name": "seed holding+coil",
+    "func": "const msgs = [\n  {\n    payload: {\n      value: 1234,\n      register: 'holding',\n      address: 0,\n      disableMsgOutput: 1\n    }\n  },\n  {\n    payload: {\n      value: 1,\n      register: 'coils',\n      address: 0,\n      disableMsgOutput: 1\n    }\n  },\n  {\n    payload: {\n      value: 77,\n      register: 'input',\n      address: 0,\n      disableMsgOutput: 1\n    }\n  }\n]\nreturn [msgs]",
+    "outputs": 1,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 330,
+    "y": 120,
+    "wires": [
+      [
+        "9fc779f4070229f4"
+      ]
+    ]
+  },
+  {
+    "id": "8717871db92e14dd",
+    "type": "inject",
+    "z": "4b45de31d290a7ad",
+    "name": "Observe dump (5s)",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "5",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 160,
+    "y": 200,
+    "wires": [
+      [
+        "9fc779f4070229f4"
+      ]
+    ]
+  },
+  {
+    "id": "5cf05c80c73e69f5",
+    "type": "debug",
+    "z": "4b45de31d290a7ad",
+    "name": "holding",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": true,
+    "complete": "type",
+    "targetType": "msg",
+    "statusVal": "type",
+    "statusType": "auto",
+    "x": 730,
+    "y": 100,
+    "wires": []
+  },
+  {
+    "id": "79d1c18e123aae73",
+    "type": "debug",
+    "z": "4b45de31d290a7ad",
+    "name": "coils",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": true,
+    "complete": "type",
+    "targetType": "msg",
+    "statusVal": "type",
+    "statusType": "auto",
+    "x": 720,
+    "y": 140,
+    "wires": []
+  },
+  {
+    "id": "2d6d818c22b567a6",
+    "type": "debug",
+    "z": "4b45de31d290a7ad",
+    "name": "input",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": true,
+    "complete": "type",
+    "targetType": "msg",
+    "statusVal": "type",
+    "statusType": "auto",
+    "x": 720,
+    "y": 180,
+    "wires": []
+  },
+  {
+    "id": "78cbe08674c4c1fd",
+    "type": "debug",
+    "z": "4b45de31d290a7ad",
+    "name": "discrete",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": true,
+    "complete": "type",
+    "targetType": "msg",
+    "statusVal": "type",
+    "statusType": "auto",
+    "x": 730,
+    "y": 220,
+    "wires": []
+  }
+]
