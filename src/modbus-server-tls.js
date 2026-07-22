@@ -54,8 +54,17 @@ module.exports = function (RED) {
 
     // Demo mode settings
     this.demoMode = config.demoMode !== false
-    this.demoDataPattern = config.demoDataPattern || 'sequential' // sequential, random, sine, square
-    this.demoUpdateInterval = parseInt(config.demoUpdateInterval) || 1000 // ms
+    this.demoDataPattern = config.demoDataPattern || 'sequential'
+    this.demoUpdateInterval = parseInt(config.demoUpdateInterval) || 1000
+    this.demoAutoStart = config.demoAutoStart !== false
+    this.demoRandomSeed = config.demoRandomSeed || null
+    this.demoValueRange = {
+      min: parseInt(config.demoValueMin) || 0,
+      max: parseInt(config.demoValueMax) || 65535
+    }
+    this.demoRealisticMode = config.demoRealisticMode || false
+    this.demoDeviceSimulation = config.demoDeviceSimulation || 'generic'
+    this.demoErrorRate = parseFloat(config.demoErrorRate) || 0
 
     this.showErrors = config.showErrors
     this.internalDebugLog = internalDebugLog
@@ -78,19 +87,81 @@ module.exports = function (RED) {
       input: Buffer.alloc(node.inputBufferSize)
     }
 
-    // Demo data generation functions
+    // Demo data generation functions (aligned with Modbus-Server-Demo)
     const generateDemoData = {
-      sequential: function (counter, max) {
-        return counter % max
+      sequential: function (counter, max, min) {
+        const range = max - min
+        return min + (counter % (range || 1))
       },
-      random: function (counter, max) {
-        return Math.floor(Math.random() * max)
+      random: function (counter, max, min) {
+        if (node.demoRandomSeed !== null && node.demoRandomSeed !== '') {
+          const seed = Number(node.demoRandomSeed) + counter
+          const x = Math.sin(seed) * 10000
+          return min + Math.floor((x - Math.floor(x)) * (max - min || 1))
+        }
+        return min + Math.floor(Math.random() * (max - min || 1))
       },
-      sine: function (counter, max) {
-        return Math.floor((Math.sin(counter * 0.1) + 1) * max / 2)
+      sine: function (counter, max, min) {
+        const range = max - min
+        return min + Math.floor((Math.sin(counter * 0.1) + 1) * range / 2)
       },
-      square: function (counter, max) {
-        return (Math.floor(counter / 10) % 2) * max
+      square: function (counter, max, min) {
+        return (Math.floor(counter / 10) % 2) ? max : min
+      },
+      sawtooth: function (counter, max, min) {
+        const period = 20
+        const range = max - min
+        return min + Math.floor((counter % period) * range / period)
+      },
+      mixed: function (counter, max, min, index) {
+        const patterns = ['sequential', 'random', 'sine', 'square', 'sawtooth']
+        const patternIndex = (index || 0) % patterns.length
+        return generateDemoData[patterns[patternIndex]](counter, max, min)
+      }
+    }
+
+    const deviceSimulations = {
+      generic: function () {
+        return generateDemoData[node.demoDataPattern](
+          node.demoCounter,
+          node.demoValueRange.max,
+          node.demoValueRange.min
+        )
+      },
+      temperature: function (index) {
+        const base = 25
+        const variation = 5 * Math.sin((node.demoCounter + index * 10) * 0.01)
+        const noise = (Math.random() - 0.5) * 0.5
+        return Math.floor((base + variation + noise) * 10)
+      },
+      pressure: function (index) {
+        const base = 1000
+        const variation = 50 * Math.sin((node.demoCounter + index * 15) * 0.005)
+        const noise = (Math.random() - 0.5) * 2
+        return Math.floor(base + variation + noise)
+      },
+      flowmeter: function (index) {
+        const base = 500
+        const variation = 300 * Math.sin((node.demoCounter + index * 20) * 0.02)
+        const noise = (Math.random() - 0.5) * 50
+        return Math.floor(Math.max(0, base + variation + noise))
+      },
+      motor: function (index) {
+        const rpm = 1500 + 500 * Math.sin(node.demoCounter * 0.01)
+        const current = 10 + 5 * Math.sin(node.demoCounter * 0.02)
+        const temp = 40 + 20 * Math.sin(node.demoCounter * 0.005)
+        switch (index % 3) {
+          case 0: return Math.floor(rpm)
+          case 1: return Math.floor(current * 10)
+          case 2: return Math.floor(temp * 10)
+          default: return Math.floor(rpm)
+        }
+      },
+      plc: function (index) {
+        if (index < 100) {
+          return (node.demoCounter + index) % 2
+        }
+        return generateDemoData.sine(node.demoCounter + index, 4095, 0)
       }
     }
 
@@ -98,29 +169,83 @@ module.exports = function (RED) {
     function updateDemoData () {
       if (!node.demoMode) return
 
-      const generator = generateDemoData[node.demoDataPattern] || generateDemoData.sequential
+      const generator = node.demoRealisticMode
+        ? deviceSimulations[node.demoDeviceSimulation] || deviceSimulations.generic
+        : generateDemoData[node.demoDataPattern] || generateDemoData.sequential
+
       node.demoCounter++
 
-      // Update coils (boolean values)
+      if (node.demoErrorRate > 0 && Math.random() < node.demoErrorRate) {
+        if (node.verboseLogging) {
+          internalDebugLog('Simulating error condition')
+        }
+        return
+      }
+
       for (let i = 0; i < node.coilsBufferSize; i++) {
-        node.demoData.coils[i] = generator(node.demoCounter + i, 2)
+        if (node.demoRealisticMode && node.demoDeviceSimulation === 'plc') {
+          node.demoData.coils[i] = generator(i) > 0 ? 1 : 0
+        } else if (node.demoDataPattern === 'mixed') {
+          node.demoData.coils[i] = generateDemoData.mixed(node.demoCounter + i, 2, 0, i)
+        } else if (node.demoRealisticMode) {
+          node.demoData.coils[i] = generator(i) > 0 ? 1 : 0
+        } else {
+          node.demoData.coils[i] = generator(node.demoCounter + i, 2, 0)
+        }
       }
 
-      // Update discrete inputs (boolean values)
       for (let i = 0; i < node.discreteBufferSize; i++) {
-        node.demoData.discrete[i] = generator(node.demoCounter + i * 2, 2)
+        if (node.demoRealisticMode && node.demoDeviceSimulation === 'plc') {
+          node.demoData.discrete[i] = generator(i + 1000) > 0 ? 1 : 0
+        } else if (node.demoDataPattern === 'mixed') {
+          node.demoData.discrete[i] = generateDemoData.mixed(node.demoCounter + i * 2, 2, 0, i)
+        } else if (node.demoRealisticMode) {
+          node.demoData.discrete[i] = generator(i + 1000) > 0 ? 1 : 0
+        } else {
+          node.demoData.discrete[i] = generator(node.demoCounter + i * 2, 2, 0)
+        }
       }
 
-      // Update holding registers (16-bit values)
       for (let i = 0; i < node.holdingBufferSize / 2; i++) {
-        const value = generator(node.demoCounter + i * 3, 65536)
-        node.demoData.holding.writeUInt16BE(value, i * 2)
+        let value
+        if (node.demoRealisticMode) {
+          value = generator(i)
+        } else if (node.demoDataPattern === 'mixed') {
+          value = generateDemoData.mixed(
+            node.demoCounter + i * 3,
+            node.demoValueRange.max,
+            node.demoValueRange.min,
+            i
+          )
+        } else {
+          value = generator(
+            node.demoCounter + i * 3,
+            node.demoValueRange.max,
+            node.demoValueRange.min
+          )
+        }
+        node.demoData.holding.writeUInt16BE(Math.max(0, Math.min(65535, value)), i * 2)
       }
 
-      // Update input registers (16-bit values)
       for (let i = 0; i < node.inputBufferSize / 2; i++) {
-        const value = generator(node.demoCounter + i * 4, 65536)
-        node.demoData.input.writeUInt16BE(value, i * 2)
+        let value
+        if (node.demoRealisticMode) {
+          value = generator(i + 2000)
+        } else if (node.demoDataPattern === 'mixed') {
+          value = generateDemoData.mixed(
+            node.demoCounter + i * 4,
+            node.demoValueRange.max,
+            node.demoValueRange.min,
+            i
+          )
+        } else {
+          value = generator(
+            node.demoCounter + i * 4,
+            node.demoValueRange.max,
+            node.demoValueRange.min
+          )
+        }
+        node.demoData.input.writeUInt16BE(Math.max(0, Math.min(65535, value)), i * 2)
       }
 
       if (node.verboseLogging) {
@@ -291,8 +416,8 @@ module.exports = function (RED) {
           mbBasics.setNodeStatusTo('listening', node)
 
           // Start demo data updates
-          if (node.demoMode) {
-            updateDemoData() // Initial data
+          if (node.demoMode && node.demoAutoStart) {
+            updateDemoData()
             node.demoTimer = setInterval(updateDemoData, node.demoUpdateInterval)
             node.status({
               fill: 'green',
@@ -312,17 +437,39 @@ module.exports = function (RED) {
     }
 
     node.on('input', function (msg) {
-      if (msg.payload === 'restart') {
-        node.warn('Restarting TLS Modbus Server')
-        stopServer(function () {
-          startServer()
-        })
-      } else if (msg.payload === 'stop') {
-        stopServer()
-      } else if (msg.payload === 'start') {
-        startServer()
+      if (typeof msg.payload === 'string') {
+        switch (msg.payload.toLowerCase()) {
+          case 'restart':
+            node.warn('Restarting TLS Modbus Server')
+            stopServer(function () {
+              startServer()
+            })
+            break
+          case 'stop':
+            stopServer()
+            break
+          case 'start':
+            startServer()
+            break
+          case 'startdemo':
+            if (node.demoMode) {
+              updateDemoData()
+              if (node.demoTimer) clearInterval(node.demoTimer)
+              node.demoTimer = setInterval(updateDemoData, node.demoUpdateInterval)
+            }
+            break
+          case 'stopdemo':
+            if (node.demoTimer) {
+              clearInterval(node.demoTimer)
+              node.demoTimer = null
+            }
+            break
+          case 'reset':
+            node.demoCounter = 0
+            updateDemoData()
+            break
+        }
       } else if (msg.payload && typeof msg.payload === 'object') {
-        // Allow updating demo data via messages
         if (msg.payload.pattern) {
           node.demoDataPattern = msg.payload.pattern
         }
@@ -333,6 +480,20 @@ module.exports = function (RED) {
             node.demoTimer = setInterval(updateDemoData, node.demoUpdateInterval)
           }
         }
+        if (msg.payload.min !== undefined) {
+          node.demoValueRange.min = parseInt(msg.payload.min)
+        }
+        if (msg.payload.max !== undefined) {
+          node.demoValueRange.max = parseInt(msg.payload.max)
+        }
+        if (msg.payload.device) {
+          node.demoDeviceSimulation = msg.payload.device
+          node.demoRealisticMode = true
+        }
+        if (msg.payload.errorRate !== undefined) {
+          node.demoErrorRate = parseFloat(msg.payload.errorRate)
+        }
+        updateDemoData()
       }
     })
 

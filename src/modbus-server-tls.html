@@ -33,7 +33,14 @@
       // Demo mode settings
       demoMode: {value: true},
       demoDataPattern: {value: 'sequential'},
-      demoUpdateInterval: {value: 1000, validate: RED.validators.number()}
+      demoUpdateInterval: {value: 1000, validate: RED.validators.number()},
+      demoAutoStart: {value: true},
+      demoRandomSeed: {value: null},
+      demoValueMin: {value: 0, validate: RED.validators.number()},
+      demoValueMax: {value: 65535, validate: RED.validators.number()},
+      demoRealisticMode: {value: false},
+      demoDeviceSimulation: {value: 'generic'},
+      demoErrorRate: {value: 0, validate: function (v) { return v >= 0 && v <= 1 }}
     },
     inputs: 1,
     outputs: 1,
@@ -44,6 +51,23 @@
     },
     info: function () {
       return "Modbus TLS Demo Server with automatic data generation for testing and demonstration."
+    },
+    oneditprepare: function () {
+      const syncDemoOptions = function () {
+        if ($('#node-input-demoMode').is(':checked')) {
+          $('.tls-demo-options').show()
+        } else {
+          $('.tls-demo-options').hide()
+        }
+        if ($('#node-input-demoRealisticMode').is(':checked')) {
+          $('.tls-realistic-options').show()
+        } else {
+          $('.tls-realistic-options').hide()
+        }
+      }
+      $('#node-input-demoMode').on('change', syncDemoOptions)
+      $('#node-input-demoRealisticMode').on('change', syncDemoOptions)
+      syncDemoOptions()
     }
   })
 </script>
@@ -102,18 +126,56 @@
     <input type="checkbox" id="node-input-demoMode" style="display: inline-block; width: auto; vertical-align: top;">
     <label for="node-input-demoMode" style="width: auto;">Enable Demo Mode</label>
   </div>
-  <div class="form-row">
+  <div class="form-row tls-demo-options">
     <label for="node-input-demoDataPattern"><i class="fa fa-line-chart"></i> Data Pattern</label>
     <select id="node-input-demoDataPattern">
       <option value="sequential">Sequential</option>
       <option value="random">Random</option>
       <option value="sine">Sine Wave</option>
       <option value="square">Square Wave</option>
+      <option value="sawtooth">Sawtooth Wave</option>
+      <option value="mixed">Mixed Patterns</option>
     </select>
   </div>
-  <div class="form-row">
+  <div class="form-row tls-demo-options">
     <label for="node-input-demoUpdateInterval"><i class="fa fa-clock-o"></i> Update Interval</label>
-    <input type="text" id="node-input-demoUpdateInterval" placeholder="1000"> ms
+    <input type="text" id="node-input-demoUpdateInterval" placeholder="1000" style="width:80px"> ms
+  </div>
+  <div class="form-row tls-demo-options">
+    <label for="node-input-demoValueMin"><i class="fa fa-arrow-down"></i> Value Range</label>
+    <input type="text" id="node-input-demoValueMin" placeholder="0" style="width:80px">
+    <span style="margin: 0 10px;">to</span>
+    <input type="text" id="node-input-demoValueMax" placeholder="65535" style="width:80px">
+  </div>
+  <div class="form-row tls-demo-options">
+    <label for="node-input-demoRandomSeed"><i class="fa fa-random"></i> Random Seed</label>
+    <input type="text" id="node-input-demoRandomSeed" placeholder="(optional - for reproducible random)">
+  </div>
+  <div class="form-row tls-demo-options">
+    <label>&nbsp;</label>
+    <input type="checkbox" id="node-input-demoAutoStart" style="display: inline-block; width: auto; vertical-align: top;">
+    <label for="node-input-demoAutoStart" style="width: auto;">Auto Start Demo Data</label>
+  </div>
+  <div class="form-row tls-demo-options">
+    <label>&nbsp;</label>
+    <input type="checkbox" id="node-input-demoRealisticMode" style="display: inline-block; width: auto; vertical-align: top;">
+    <label for="node-input-demoRealisticMode" style="width: auto;">Enable Realistic Mode</label>
+  </div>
+  <div class="form-row tls-demo-options tls-realistic-options">
+    <label for="node-input-demoDeviceSimulation"><i class="fa fa-microchip"></i> Device Type</label>
+    <select id="node-input-demoDeviceSimulation">
+      <option value="generic">Generic Device</option>
+      <option value="temperature">Temperature Sensors</option>
+      <option value="pressure">Pressure Sensors</option>
+      <option value="flowmeter">Flow Meters</option>
+      <option value="motor">Motor Controller</option>
+      <option value="plc">PLC Simulation</option>
+    </select>
+  </div>
+  <div class="form-row tls-demo-options tls-realistic-options">
+    <label for="node-input-demoErrorRate"><i class="fa fa-exclamation-triangle"></i> Error Rate</label>
+    <input type="text" id="node-input-demoErrorRate" placeholder="0.0" style="width:80px">
+    <span style="margin-left: 10px;">(0.0 - 1.0)</span>
   </div>
   
   <h4>Buffer Sizes</h4>
@@ -141,6 +203,8 @@
     <select id="node-input-delayUnit" style="width:110px">
       <option value="ms">Milliseconds</option>
       <option value="s">Seconds</option>
+      <option value="m">Minutes</option>
+      <option value="h">Hours</option>
     </select>
   </div>
   <div class="form-row">
@@ -177,27 +241,35 @@
   <ul>
     <li>Generate a self-signed certificate if none is provided</li>
     <li>Automatically populate registers with demo data</li>
+    <li>Support patterns: sequential, random, sine, square, sawtooth, mixed</li>
+    <li>Optionally use realistic device simulation (temperature, pressure, motor, PLC)</li>
+    <li>Allow Inject control: <code>startdemo</code>, <code>stopdemo</code>, <code>reset</code></li>
     <li>Update data periodically based on the selected pattern</li>
   </ul>
   
   <h3>Data Patterns</h3>
   <ul>
     <li><b>Sequential</b>: Incrementing values</li>
-    <li><b>Random</b>: Random values within range</li>
+    <li><b>Random</b>: Random values within range (optional seed)</li>
     <li><b>Sine Wave</b>: Sinusoidal pattern</li>
     <li><b>Square Wave</b>: Alternating high/low values</li>
+    <li><b>Sawtooth</b>: Rising ramp pattern</li>
+    <li><b>Mixed</b>: Different patterns per register index</li>
   </ul>
   
   <h3>Inputs</h3>
   <dl class="message-properties">
     <dt>payload <span class="property-type">string | object</span></dt>
-    <dd>Control commands: "start", "stop", "restart", or configuration object</dd>
+    <dd>Control commands: "start", "stop", "restart", "startdemo", "stopdemo", "reset", or configuration object</dd>
   </dl>
   
   <h3>Configuration Update</h3>
   <p>Send an object with the following properties to update configuration:</p>
   <ul>
-    <li><code>pattern</code>: Data pattern ("sequential", "random", "sine", "square")</li>
+    <li><code>pattern</code>: Data pattern ("sequential", "random", "sine", "square", "sawtooth", "mixed")</li>
     <li><code>interval</code>: Update interval in milliseconds</li>
+    <li><code>min</code> / <code>max</code>: Value range</li>
+    <li><code>device</code>: Realistic device type (enables realistic mode)</li>
+    <li><code>errorRate</code>: Simulated error probability (0.0 - 1.0)</li>
   </ul>
 </script>
